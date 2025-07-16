@@ -1,0 +1,261 @@
+<div class="test-create-container">
+  <!-- Header Section -->
+  <div class="form-header">
+    <div class="header-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14,2 14,8 20,8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10,9 9,9 8,9"/>
+      </svg>
+    </div>
+    <h1>Create Test Record</h1>
+    <p>Fill out the form below to create a new test record using reactive forms</p>
+  </div>
+
+  <!-- Success Message -->
+  <div *ngIf="submitSuccess" class="alert alert-success">
+    <div class="alert-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="20,6 9,17 4,12"/>
+      </svg>
+    </div>
+    <div class="alert-content">
+      <h3>Success!</h3>
+      <p>Test record created successfully!</p>
+    </div>
+  </div>
+
+  <!-- Form Card -->
+  <div class="form-card">
+    <form [formGroup]="testForm" (ngSubmit)="onSubmit()" class="test-form">
+      
+      <!-- Personal Information Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+          </div>
+          <h2>Personal Information</h2>
+        </div>
+
+        <div class="form-row">
+          <!-- Name Field -->
+          <div class="form-group col-md-6">
+            <label for="name">
+              <div class="label-content">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                  <circle cx="12" cy="7" r="4"/>
+                </svg>
+                <span>Full Name *</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <input 
+                type="text" 
+                id="name"
+                formControlName="name"
+                class="form-control"
+                [class.error]="isFieldInvalid('name')"
+                placeholder="Enter your full name">
+            </div>
+            <div *ngIf="isFieldInvalid('name')" class="error-message">
+              {{ getFieldError('name') }}
+            </div>
+          </div>
+
+          <!-- Email Field -->
+          <div class="form-group col-md-6">
+            <label for="email">
+              <div class="label-content">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+                <span>Email Address *</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <input 
+                type="email" 
+                id="email"
+                formControlName="email"
+                class="form-control"
+                [class.error]="isFieldInvalid('email')"
+                placeholder="Enter your email address">
+            </div>
+            <div *ngIf="isFieldInvalid('email')" class="error-message">
+              {{ getFieldError('email') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <!-- Age Field -->
+          <div class="form-group col-md-4">
+            <label for="age">
+              <div class="label-content">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12,6 12,12 16,14"/>
+                </svg>
+                <span>Age *</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <input 
+                type="number" 
+                id="age"
+                formControlName="age"
+                class="form-control"
+                [class.error]="isFieldInvalid('age')"
+                placeholder="Age"
+                min="1"
+                max="120">
+            </div>
+            <div *ngIf="isFieldInvalid('age')" class="error-message">
+              {{ getFieldError('age') }}
+            </div>
+          </div>
+
+          <!-- Phone Field -->
+          <div class="form-group col-md-8">
+            <label for="phone">
+              <div class="label-content">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                </svg>
+                <span>Phone Number *</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <input 
+                type="tel" 
+                id="phone"
+                formControlName="phone"
+                class="form-control"
+                [class.error]="isFieldInvalid('phone')"
+                placeholder="Enter your phone number">
+            </div>
+            <div *ngIf="isFieldInvalid('phone')" class="error-message">
+              {{ getFieldError('phone') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address & Department Section -->
+      <div class="form-section">
+        <div class="section-header">
+          <div class="section-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <h2>Location & Department</h2>
+        </div>
+
+        <div class="form-row">
+          <!-- Address Field -->
+          <div class="form-group col-md-8">
+            <label for="address">
+              <div class="label-content">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                  <polyline points="9,22 9,12 15,12 15,22"/>
+                </svg>
+                <span>Address *</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <textarea 
+                id="address"
+                formControlName="address"
+                class="form-control"
+                [class.error]="isFieldInvalid('address')"
+                placeholder="Enter your complete address"
+                rows="3"></textarea>
+            </div>
+            <div *ngIf="isFieldInvalid('address')" class="error-message">
+              {{ getFieldError('address') }}
+            </div>
+          </div>
+
+          <!-- Department Field -->
+          <div class="form-group col-md-4">
+            <label for="department">
+              <div class="label-content">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M3 21h18"/>
+                  <path d="M5 21V7l8-4v18"/>
+                  <path d="M19 21V11l-6-4"/>
+                </svg>
+                <span>Department *</span>
+              </div>
+            </label>
+            <div class="input-group">
+              <select 
+                id="department"
+                formControlName="department"
+                class="form-control"
+                [class.error]="isFieldInvalid('department')">
+                <option value="">Select Department</option>
+                <option value="IT">Information Technology</option>
+                <option value="HR">Human Resources</option>
+                <option value="Finance">Finance</option>
+                <option value="Marketing">Marketing</option>
+                <option value="Operations">Operations</option>
+                <option value="Sales">Sales</option>
+              </select>
+            </div>
+            <div *ngIf="isFieldInvalid('department')" class="error-message">
+              {{ getFieldError('department') }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary" 
+          (click)="onReset()"
+          [disabled]="isSubmitting">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3,6 5,6 21,6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          <span>Reset Form</span>
+        </button>
+        
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="testForm.invalid || isSubmitting">
+          <span *ngIf="isSubmitting" class="spinner"></span>
+          <svg *ngIf="!isSubmitting" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="20,6 9,17 4,12"/>
+          </svg>
+          <span *ngIf="isSubmitting">Creating...</span>
+          <span *ngIf="!isSubmitting">Create Record</span>
+        </button>
+      </div>
+
+      <!-- Form Debug Info (for development) -->
+      <div class="form-debug" *ngIf="false">
+        <h4>Form Debug Info:</h4>
+        <p><strong>Form Status:</strong> {{ testForm.status }}</p>
+        <p><strong>Form Valid:</strong> {{ testForm.valid }}</p>
+        <p><strong>Form Value:</strong></p>
+        <pre>{{ testForm.value | json }}</pre>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,377 @@
+<div class="create-product-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>Create New Product</h1>
+      <p>Add a new product to your inventory</p>
+    </div>
+    <div class="header-actions">
+      <button type="button" class="btn btn-secondary" (click)="cancel()">Cancel</button>
+      <button type="submit" form="productForm" class="btn btn-primary" [disabled]="loading">
+        <span *ngIf="loading">Creating...</span>
+        <span *ngIf="!loading">Create Product</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Success Message -->
+  <div *ngIf="success" class="alert alert-success">
+    <div class="alert-icon">✅</div>
+    <div class="alert-content">
+      <h3>Product Created Successfully!</h3>
+      <p>Redirecting to product list...</p>
+    </div>
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="error" class="alert alert-error">
+    <div class="alert-icon">❌</div>
+    <div class="alert-content">
+      <h3>Error</h3>
+      <p>{{ error }}</p>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <form [formGroup]="productForm" (ngSubmit)="onSubmit()" id="productForm" class="product-form">
+    <div class="form-grid">
+      <!-- Basic Information -->
+      <div class="form-section">
+        <h2>Basic Information</h2>
+        
+        <div class="form-group">
+          <label for="title">Product Title *</label>
+          <input 
+            type="text" 
+            id="title" 
+            formControlName="title" 
+            class="form-control"
+            [class.error]="isFieldInvalid('title')"
+            placeholder="Enter product title">
+          <div *ngIf="isFieldInvalid('title')" class="error-message">
+            {{ getFieldError('title') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description *</label>
+          <textarea 
+            id="description" 
+            formControlName="description" 
+            class="form-control"
+            [class.error]="isFieldInvalid('description')"
+            placeholder="Enter product description"
+            rows="4"></textarea>
+          <div *ngIf="isFieldInvalid('description')" class="error-message">
+            {{ getFieldError('description') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="category">Category *</label>
+          <select 
+            id="category" 
+            formControlName="category" 
+            class="form-control"
+            [class.error]="isFieldInvalid('category')">
+            <option value="">Select a category</option>
+            <option *ngFor="let category of categories" [value]="category">
+              {{ category | titlecase }}
+            </option>
+          </select>
+          <div *ngIf="isFieldInvalid('category')" class="error-message">
+            {{ getFieldError('category') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="brand">Brand *</label>
+          <input 
+            type="text" 
+            id="brand" 
+            formControlName="brand" 
+            class="form-control"
+            [class.error]="isFieldInvalid('brand')"
+            placeholder="Enter brand name">
+          <div *ngIf="isFieldInvalid('brand')" class="error-message">
+            {{ getFieldError('brand') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Pricing & Inventory -->
+      <div class="form-section">
+        <h2>Pricing & Inventory</h2>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label for="price">Price *</label>
+            <input 
+              type="number" 
+              id="price" 
+              formControlName="price" 
+              class="form-control"
+              [class.error]="isFieldInvalid('price')"
+              placeholder="0.00"
+              step="0.01"
+              min="0">
+            <div *ngIf="isFieldInvalid('price')" class="error-message">
+              {{ getFieldError('price') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="discountPercentage">Discount %</label>
+            <input 
+              type="number" 
+              id="discountPercentage" 
+              formControlName="discountPercentage" 
+              class="form-control"
+              [class.error]="isFieldInvalid('discountPercentage')"
+              placeholder="0"
+              min="0"
+              max="100">
+            <div *ngIf="isFieldInvalid('discountPercentage')" class="error-message">
+              {{ getFieldError('discountPercentage') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="stock">Stock Quantity *</label>
+            <input 
+              type="number" 
+              id="stock" 
+              formControlName="stock" 
+              class="form-control"
+              [class.error]="isFieldInvalid('stock')"
+              placeholder="0"
+              min="0">
+            <div *ngIf="isFieldInvalid('stock')" class="error-message">
+              {{ getFieldError('stock') }}
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="minimumOrderQuantity">Min Order Quantity *</label>
+            <input 
+              type="number" 
+              id="minimumOrderQuantity" 
+              formControlName="minimumOrderQuantity" 
+              class="form-control"
+              [class.error]="isFieldInvalid('minimumOrderQuantity')"
+              placeholder="1"
+              min="1">
+            <div *ngIf="isFieldInvalid('minimumOrderQuantity')" class="error-message">
+              {{ getFieldError('minimumOrderQuantity') }}
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="availabilityStatus">Availability Status *</label>
+          <select 
+            id="availabilityStatus" 
+            formControlName="availabilityStatus" 
+            class="form-control"
+            [class.error]="isFieldInvalid('availabilityStatus')">
+            <option value="In Stock">In Stock</option>
+            <option value="Low Stock">Low Stock</option>
+            <option value="Out of Stock">Out of Stock</option>
+          </select>
+          <div *ngIf="isFieldInvalid('availabilityStatus')" class="error-message">
+            {{ getFieldError('availabilityStatus') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Details -->
+      <div class="form-section">
+        <h2>Product Details</h2>
+        
+        <div class="form-group">
+          <label for="sku">SKU *</label>
+          <div class="input-group">
+            <input 
+              type="text" 
+              id="sku" 
+              formControlName="sku" 
+              class="form-control"
+              [class.error]="isFieldInvalid('sku')"
+              placeholder="Product SKU">
+            <button type="button" class="btn btn-outline" (click)="generateSKU()">
+              Generate
+            </button>
+          </div>
+          <div *ngIf="isFieldInvalid('sku')" class="error-message">
+            {{ getFieldError('sku') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="weight">Weight (kg) *</label>
+          <input 
+            type="number" 
+            id="weight" 
+            formControlName="weight" 
+            class="form-control"
+            [class.error]="isFieldInvalid('weight')"
+            placeholder="0.00"
+            step="0.01"
+            min="0">
+          <div *ngIf="isFieldInvalid('weight')" class="error-message">
+            {{ getFieldError('weight') }}
+          </div>
+        </div>
+
+        <!-- Dimensions -->
+        <div class="form-group" formGroupName="dimensions">
+          <label>Dimensions (cm) *</label>
+          <div class="form-row">
+            <div class="form-group">
+              <input 
+                type="number" 
+                formControlName="width" 
+                class="form-control"
+                placeholder="Width"
+                step="0.01"
+                min="0">
+            </div>
+            <div class="form-group">
+              <input 
+                type="number" 
+                formControlName="height" 
+                class="form-control"
+                placeholder="Height"
+                step="0.01"
+                min="0">
+            </div>
+            <div class="form-group">
+              <input 
+                type="number" 
+                formControlName="depth" 
+                class="form-control"
+                placeholder="Depth"
+                step="0.01"
+                min="0">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="rating">Rating</label>
+          <input 
+            type="number" 
+            id="rating" 
+            formControlName="rating" 
+            class="form-control"
+            [class.error]="isFieldInvalid('rating')"
+            placeholder="0.0"
+            step="0.1"
+            min="0"
+            max="5">
+          <div *ngIf="isFieldInvalid('rating')" class="error-message">
+            {{ getFieldError('rating') }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Images -->
+      <div class="form-section">
+        <h2>Product Images</h2>
+        
+        <div class="form-group">
+          <label for="thumbnail">Thumbnail Image *</label>
+          <input 
+            type="url" 
+            id="thumbnail" 
+            formControlName="thumbnail" 
+            class="form-control"
+            [class.error]="isFieldInvalid('thumbnail')"
+            placeholder="https://example.com/image.jpg">
+          <div *ngIf="isFieldInvalid('thumbnail')" class="error-message">
+            {{ getFieldError('thumbnail') }}
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Additional Images</label>
+          <div formArrayName="images" class="dynamic-inputs">
+            <div *ngFor="let image of images.controls; let i = index" class="input-group">
+              <input 
+                type="url" 
+                [formControlName]="i"
+                class="form-control"
+                [placeholder]="'Image URL ' + (i + 1)">
+              <button type="button" class="btn btn-outline btn-danger" (click)="removeImage(i)">
+                Remove
+              </button>
+            </div>
+            <button type="button" class="btn btn-outline" (click)="addImage()">
+              Add Image
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tags -->
+      <div class="form-section">
+        <h2>Tags</h2>
+        
+        <div class="form-group">
+          <label>Product Tags</label>
+          <div formArrayName="tags" class="dynamic-inputs">
+            <div *ngFor="let tag of tags.controls; let i = index" class="input-group">
+              <input 
+                type="text" 
+                [formControlName]="i"
+                class="form-control"
+                [placeholder]="'Tag ' + (i + 1)">
+              <button type="button" class="btn btn-outline btn-danger" (click)="removeTag(i)">
+                Remove
+              </button>
+            </div>
+            <button type="button" class="btn btn-outline" (click)="addTag()">
+              Add Tag
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Additional Information -->
+      <div class="form-section">
+        <h2>Additional Information</h2>
+        
+        <div class="form-group">
+          <label for="warrantyInformation">Warranty Information</label>
+          <textarea 
+            id="warrantyInformation" 
+            formControlName="warrantyInformation" 
+            class="form-control"
+            placeholder="Enter warranty details"
+            rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="shippingInformation">Shipping Information</label>
+          <textarea 
+            id="shippingInformation" 
+            formControlName="shippingInformation" 
+            class="form-control"
+            placeholder="Enter shipping details"
+            rows="3"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="returnPolicy">Return Policy</label>
+          <textarea 
+            id="returnPolicy" 
+            formControlName="returnPolicy" 
+            class="form-control"
+            placeholder="Enter return policy details"
+            rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>

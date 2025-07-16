@@ -1,0 +1,174 @@
+<div class="product-details-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="spinner"></div>
+    <p>Loading product details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <div class="error-icon">⚠️</div>
+    <h3>Error Loading Product</h3>
+    <p>{{ error }}</p>
+    <button (click)="goBack()" class="btn btn-primary">Go Back</button>
+  </div>
+
+  <!-- Product Details -->
+  <div *ngIf="product && !loading && !error" class="product-details">
+    <!-- Header -->
+    <header class="product-header">
+      <div class="breadcrumb">
+        <a (click)="goBack()" class="breadcrumb-link">Products</a>
+        <span class="breadcrumb-separator">→</span>
+        <span class="breadcrumb-current">{{ product.title }}</span>
+      </div>
+      
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="goBack()">
+          <span class="btn-icon">←</span>
+          Back to List
+        </button>
+        <button class="btn btn-primary" (click)="editProduct()">
+          <span class="btn-icon">✏️</span>
+          Edit Product
+        </button>
+        <button class="btn btn-danger" (click)="deleteProduct()">
+          <span class="btn-icon">🗑️</span>
+          Delete
+        </button>
+      </div>
+    </header>
+
+    <!-- Product Content -->
+    <div class="product-content">
+      <!-- Product Images -->
+      <div class="product-images">
+        <div class="main-image">
+          <img 
+            [src]="product.images && product.images.length > 0 ? product.images[selectedImageIndex] : product.thumbnail" 
+            [alt]="product.title"
+            class="main-image-img">
+          <div *ngIf="product.discountPercentage > 0" class="discount-badge">
+            -{{ product.discountPercentage }}%
+          </div>
+        </div>
+        
+        <div *ngIf="product.images && product.images.length > 1" class="image-thumbnails">
+          <div 
+            *ngFor="let image of product.images; let i = index"
+            class="thumbnail"
+            [class.active]="selectedImageIndex === i"
+            (click)="selectImage(i)">
+            <img [src]="image" [alt]="product.title + ' image ' + (i + 1)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Info -->
+      <div class="product-info">
+        <div class="product-category">{{ product.category | titlecase }}</div>
+        <h1 class="product-title">{{ product.title }}</h1>
+        <div class="product-brand">by {{ product.brand }}</div>
+        
+        <div class="product-rating">
+          <div class="rating-stars">
+            <span *ngFor="let star of getRatingStars()" class="star">{{ star }}</span>
+          </div>
+          <span class="rating-value">{{ product.rating }}</span>
+          <span class="rating-count">({{ product.reviews.length || 0 }} reviews)</span>
+        </div>
+
+        <div class="product-pricing">
+          <div class="price-main">${{ product.price }}</div>
+          <div *ngIf="product.discountPercentage > 0" class="price-original">
+            ${{ (product.price / (1 - product.discountPercentage / 100)).toFixed(2) }}
+          </div>
+        </div>
+
+        <div class="product-stock">
+          <span class="stock-status" [class]="getStockStatusClass()">
+            {{ getStockStatus() }}
+          </span>
+          <span class="stock-count">{{ product.stock }} units available</span>
+        </div>
+
+        <div class="product-description">
+          <h3>Description</h3>
+          <p>{{ product.description }}</p>
+        </div>
+
+        <div *ngIf="product.tags && product.tags.length > 0" class="product-tags">
+          <h3>Tags</h3>
+          <div class="tags-list">
+            <span *ngFor="let tag of product.tags" class="tag">{{ tag }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Specifications -->
+    <div class="product-specifications">
+      <h2>Specifications</h2>
+      
+      <div class="specs-grid">
+        <div class="spec-item">
+          <label>SKU</label>
+          <span>{{ product.sku }}</span>
+        </div>
+        
+        <div class="spec-item">
+          <label>Weight</label>
+          <span>{{ product.weight }} kg</span>
+        </div>
+        
+        <div *ngIf="product.dimensions" class="spec-item">
+          <label>Dimensions</label>
+          <span>{{ product.dimensions.width }} × {{ product.dimensions.height }} × {{ product.dimensions.depth }} cm</span>
+        </div>
+        
+        <div class="spec-item">
+          <label>Minimum Order</label>
+          <span>{{ product.minimumOrderQuantity }} units</span>
+        </div>
+        
+        <div class="spec-item">
+          <label>Availability</label>
+          <span>{{ product.availabilityStatus }}</span>
+        </div>
+        
+        <div *ngIf="product.warrantyInformation" class="spec-item">
+          <label>Warranty</label>
+          <span>{{ product.warrantyInformation }}</span>
+        </div>
+        
+        <div *ngIf="product.shippingInformation" class="spec-item">
+          <label>Shipping</label>
+          <span>{{ product.shippingInformation }}</span>
+        </div>
+        
+        <div *ngIf="product.returnPolicy" class="spec-item">
+          <label>Return Policy</label>
+          <span>{{ product.returnPolicy }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Reviews -->
+    <div *ngIf="product.reviews && product.reviews.length > 0" class="product-reviews">
+      <h2>Customer Reviews ({{ product.reviews.length }})</h2>
+      
+      <div class="reviews-list">
+        <div *ngFor="let review of product.reviews" class="review-item">
+          <div class="review-header">
+            <div class="reviewer-name">{{ review.reviewerName }}</div>
+            <div class="review-rating">
+              <span *ngFor="let star of getRatingStars()" class="star">{{ star }}</span>
+            </div>
+            <div class="review-date">{{ review.date | date:'medium' }}</div>
+          </div>
+          <div class="review-comment">{{ review.comment }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

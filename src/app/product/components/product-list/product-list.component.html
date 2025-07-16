@@ -1,0 +1,238 @@
+<div class="product-list-container">
+  <!-- Header Section -->
+  <header class="page-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>Product Management</h1>
+        <p>Manage your complete product inventory with advanced filtering and sorting</p>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" (click)="retryLoad()" [disabled]="loading">
+          <span class="btn-icon">🔄</span>
+          Refresh
+        </button>
+        <button class="btn btn-primary" routerLink="/products/create">
+          <span class="btn-icon">➕</span>
+          Add Product
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Filters and Search Section -->
+  <section class="filters-section" *ngIf="!loading && !error">
+    <div class="search-controls">
+      <div class="search-input-group">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Search products by title, description, brand..."
+          [value]="searchTerm"
+          (input)="onSearch($event)">
+      </div>
+      
+      <div class="filter-group">
+        <select class="filter-select" [value]="selectedCategory" (change)="onCategoryChange($event)">
+          <option value="">All Categories</option>
+          <option *ngFor="let category of categories" [value]="category">
+            {{ category | titlecase }}
+          </option>
+        </select>
+        
+        <select class="filter-select" [value]="sortBy" (change)="onSortChange($event)">
+          <option value="title">Sort by Title</option>
+          <option value="price">Sort by Price</option>
+          <option value="rating">Sort by Rating</option>
+          <option value="stock">Sort by Stock</option>
+          <option value="discountPercentage">Sort by Discount</option>
+        </select>
+        
+        <button class="sort-order-btn" (click)="toggleSortOrder()" [title]="'Sort ' + sortOrder">
+          <span *ngIf="sortOrder === 'asc'">↑</span>
+          <span *ngIf="sortOrder === 'desc'">↓</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="results-info">
+      <span class="results-count">
+        Showing {{ filteredProducts.length }} of {{ products.length }} products
+      </span>
+    </div>
+  </section>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-state">
+    <div class="loading-spinner">
+      <div class="spinner"></div>
+    </div>
+    <p class="loading-text">Loading products from API...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error-state">
+    <div class="error-content">
+      <div class="error-icon">⚠️</div>
+      <h3 class="error-title">Unable to Load Products</h3>
+      <p class="error-message">{{ error }}</p>
+      <div class="error-actions">
+        <button class="btn btn-primary" (click)="retryLoad()">
+          <span class="btn-icon">🔄</span>
+          Try Again
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div *ngIf="!loading && !error && filteredProducts.length > 0" class="products-grid">
+    <div 
+      *ngFor="let product of filteredProducts; trackBy: trackByProductId" 
+      class="product-card"
+      [attr.data-category]="product.category">
+      
+      <!-- Product Image Section -->
+      <div class="product-image-section">
+        <div class="product-image-container">
+          <img 
+            [src]="product.thumbnail" 
+            [alt]="product.title" 
+            class="product-image"
+            loading="lazy" 
+            onerror="this.src='assets/placeholder-product.png'">
+          
+          <!-- Badges -->
+          <div class="product-badges">
+            <div class="discount-badge" *ngIf="product.discountPercentage > 0">
+              -{{ product.discountPercentage | number:'1.0-1' }}%
+            </div>
+            <div class="stock-badge" [class]="getStockStatus(product.stock)">
+              {{ getStockStatus(product.stock) | titlecase }}
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Product Information -->
+      <div class="product-info">
+        <!-- Basic Info -->
+        <div class="product-basic-info">
+          <h3 class="product-title" [title]="product.title">{{ product.title }}</h3>
+          <p class="product-brand">{{ product.brand }}</p>
+          <p class="product-category">{{ product.category | titlecase }}</p>
+        </div>
+
+        <!-- Description -->
+        <p class="product-description" [title]="product.description">
+          {{ product.description }}
+        </p>
+        
+        <!-- Rating and Reviews -->
+        <div class="product-rating-section">
+          <div class="rating-display">
+            <span class="rating-stars">
+              <span *ngFor="let star of [1,2,3,4,5]" 
+                    class="star" 
+                    [class.filled]="star <= product.rating">★</span>
+            </span>
+            <span class="rating-value">{{ product.rating | number:'1.1-1' }}</span>
+            <span class="reviews-count">({{ product.reviews.length || 0 }} reviews)</span>
+          </div>
+        </div>
+        
+        <!-- Pricing Section -->
+        <div class="product-pricing">
+          <div class="price-group">
+            <span class="current-price">
+              {{ formatPrice(getDiscountedPrice(product.price, product.discountPercentage)) }}
+            </span>
+            <span class="original-price" *ngIf="product.discountPercentage > 0">
+              {{ formatPrice(product.price) }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Stock and Availability -->
+        <div class="product-availability">
+          <div class="stock-info">
+            <span class="stock-label">Stock:</span>
+            <span class="stock-value" [class]="getStockStatus(product.stock)">
+              {{ product.stock }} units
+            </span>
+          </div>
+          <div class="availability-status">
+            <span class="availability-indicator" [class]="product.availabilityStatus.toLowerCase().replace(' ', '-')">
+              {{ product.availabilityStatus }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Product Specifications -->
+        <div class="product-specs">
+          <div class="spec-item" *ngIf="product.weight">
+            <span class="spec-label">Weight:</span>
+            <span class="spec-value">{{ product.weight }}kg</span>
+          </div>
+          <div class="spec-item" *ngIf="product.dimensions">
+            <span class="spec-label">Dimensions:</span>
+            <span class="spec-value">
+              {{ product.dimensions.width }}×{{ product.dimensions.height }}×{{ product.dimensions.depth }}cm
+            </span>
+          </div>
+          <div class="spec-item" *ngIf="product.warrantyInformation">
+            <span class="spec-label">Warranty:</span>
+            <span class="spec-value">{{ product.warrantyInformation }}</span>
+          </div>
+        </div>
+
+        <!-- Tags -->
+        <div class="product-tags" *ngIf="product.tags && product.tags.length > 0">
+          <span class="tag" *ngFor="let tag of product.tags.slice(0, 3)">{{ tag }}</span>
+          <span class="tag-more" *ngIf="product.tags.length > 3">+{{ product.tags.length - 3 }} more</span>
+        </div>
+        
+        <!-- Action Buttons -->
+        <div class="product-actions">
+          <button class="btn btn-outline" [routerLink]="['/products', product.id]">
+            <span class="btn-icon">👁️</span>
+            View Details
+          </button>
+          <button class="btn btn-secondary" [routerLink]="['/products', product.id, 'edit']">
+            <span class="btn-icon">✏️</span>
+            Edit
+          </button>
+          <button class="btn btn-tertiary" (click)="viewImages(product)">
+            <span class="btn-icon">🖼️</span>
+            Gallery ({{ product.images.length || 0 }})
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!loading && !error && filteredProducts.length === 0 && products.length > 0" class="empty-filtered-state">
+    <div class="empty-content">
+      <div class="empty-icon">🔍</div>
+      <h3 class="empty-title">No products match your filters</h3>
+      <p class="empty-message">Try adjusting your search terms or filters</p>
+      <button class="btn btn-secondary" (click)="searchTerm = ''; selectedCategory = ''; filterProducts()">
+        Clear Filters
+      </button>
+    </div>
+  </div>
+
+  <!-- No Products State -->
+  <div *ngIf="!loading && !error && products.length === 0" class="empty-state">
+    <div class="empty-content">
+      <div class="empty-icon">📦</div>
+      <h3 class="empty-title">No products found</h3>
+      <p class="empty-message">Start building your inventory by adding your first product</p>
+      <button class="btn btn-primary" routerLink="/products/create">
+        <span class="btn-icon">➕</span>
+        Add Your First Product
+      </button>
+    </div>
+  </div>
+</div>
