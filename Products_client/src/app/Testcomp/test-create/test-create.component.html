@@ -257,5 +257,24 @@
         <pre>{{ testForm.value | json }}</pre>
       </div>
     </form>
-  </div>
+
+
+    <form [formGroup]="t2Form" (ngSubmit)="postData()" class="test-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name2">Name</label>
+          <input type="text" id="name2" formControlName="name" class="form-control">
+        </div>
+        <div class="form-group">
+          <label for="description">Description</label>
+          <input type="text" id="description" formControlName="description" class="form-control">
+        </div>
+
+        <div class="form-group">
+          <label for="price">Price</label>
+          <input type="number" id="price" formControlName="price" class="form-control">
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
 </div>

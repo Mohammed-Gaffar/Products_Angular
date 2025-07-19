@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ServiceService } from '../service.service';
+import { ProductDto } from '../interfaces/testinter';
 
 @Component({
   selector: 'app-test-create',
@@ -11,10 +13,12 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 })
 export class TestCreateComponent implements OnInit {
   testForm!: FormGroup;
+  t2Form!:FormGroup;
+
   isSubmitting = false;
   submitSuccess = false;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private service: ServiceService) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -29,7 +33,48 @@ export class TestCreateComponent implements OnInit {
       address: ['', [Validators.required, Validators.minLength(5)]],
       department:['',[Validators.required]]
     });
+
+    this.t2Form = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      description : ['', [Validators.required, Validators.minLength(5)]],
+      price: [0, [Validators.required, Validators.min(0)]]
+    });
+
+    this.getdata();
+
   }
+
+  getdata() {
+    this.service.getData().subscribe(data => {
+      console.log('Fetched Data:', data);
+      // You can use the fetched data to populate the form if needed
+    });
+  }
+
+  postData() {
+
+    const item: ProductDto = {
+      id: 0,
+      name: "dsf",
+      description: "Sample description",
+      price: 100
+    };
+
+    this.service.postData(this.t2Form.value).subscribe(response => {
+      console.log('Data posted successfully:', response);
+      // Handle success response
+    }, error => {
+      console.error('Error posting data:', error);
+      // Handle error response
+    });
+    // if (this.testForm.valid) {
+    //   this.service.postData(this.testForm.value).subscribe(response => {
+    //     console.log('Data posted successfully:', response);
+    //   });
+    // }
+  }
+
+  
 
   onSubmit(): void {
     if (this.testForm.valid) {
@@ -81,4 +126,7 @@ export class TestCreateComponent implements OnInit {
       }
     });
   }
+
+
+
 }
